@@ -2,173 +2,413 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Delivery Challan - CTG</title>
+  <title>Delivery Challan Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #0b5ed7;
+    }
+    * { box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f9f9f9;
-      color: #333;
+      margin: 0; padding: 24px; background: var(--bg); color: var(--text);
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
     }
-    .container {
-      max-width: 900px;
-      margin: auto;
+    h1 { text-align: center; margin: 0 0 16px; }
+    .wrap {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;
+    }
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+    }
+    .card h2 { margin: 0 0 12px; font-size: 18px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+    input, textarea, select {
+      width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text);
       background: #fff;
-      padding: 20px;
-      border: 1px solid #ccc;
     }
-    h1, h2 {
-      text-align: center;
-      margin-bottom: 10px;
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    button {
+      padding: 10px 14px; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 8px;
+      cursor: pointer; font-weight: 600;
     }
-    .section {
-      margin-bottom: 20px;
+    button.secondary { background: transparent; color: var(--accent); }
+    button.danger { background: #b91c1c; border-color: #b91c1c; }
+    .table {
+      width: 100%; border-collapse: collapse; margin-top: 12px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+    .table th, .table td {
+      border: 1px solid var(--border); padding: 8px; text-align: left; vertical-align: top; font-size: 13px;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-      vertical-align: top;
+    .table th { background: #f3f4f6; }
+    .preview {
+      background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px;
     }
-    th {
-      background-color: #f0f0f0;
+    .header {
+      text-align: center; margin-bottom: 8px;
     }
-    .totals td {
-      font-weight: bold;
+    .muted { color: var(--muted); }
+    .section-title {
+      font-weight: 600; margin: 14px 0 8px; color: var(--text);
+      border-bottom: 1px solid var(--border); padding-bottom: 6px;
     }
-    .footer-table td {
-      border: none;
+    .flex { display: flex; gap: 12px; }
+    .flex-col { flex: 1; }
+    .totals-box {
+      margin-top: 12px; display: flex; justify-content: flex-end;
+    }
+    .totals-card {
+      min-width: 320px; border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+    }
+    .totals-line { display: flex; justify-content: space-between; margin: 6px 0; }
+    .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .sign-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+    .signature-line { height: 28px; border-bottom: 1px dashed var(--border); }
+
+    /* Print styles for clean PDF */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .wrap { grid-template-columns: 1fr; }
+      .card { border: none; padding: 0; }
+      .controls { display: none !important; } /* Hide buttons in PDF */
+      .preview { border: none; border-radius: 0; padding: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>OLD R&D CWS RSRTC AJMER</h1>
-    <p style="text-align:center;">MAKHUPURA AJMER<br>Phone no.: 9549456734 / 9549656296</p>
+  <h1>Delivery Challan Portal</h1>
+  <div class="wrap">
+    <!-- Form -->
+    <div class="card controls">
+      <h2>Enter challan details</h2>
+      <form id="challanForm">
+        <div class="grid-2">
+          <div>
+            <label>Company name</label>
+            <input id="company_name" placeholder="OLD R&D CWS RSRTC AJMER" />
+          </div>
+          <div>
+            <label>Phone</label>
+            <input id="company_phone" placeholder="9549456734 / 9549656296" />
+          </div>
+        </div>
 
-    <h2>Delivery Challan</h2>
+        <label>Company address</label>
+        <input id="company_address" placeholder="MAKHUPURA AJMER" />
 
-    <div class="section">
-      <strong>Delivery Challan For:</strong> CTG
+        <div class="grid-2">
+          <div>
+            <label>Delivery challan for</label>
+            <input id="challan_for" placeholder="CTG" />
+          </div>
+          <div>
+            <label>Date</label>
+            <input id="challan_date" type="date" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label>Vehicle number</label>
+            <input id="vehicle_number" placeholder="BY HAND" />
+          </div>
+          <div>
+            <label>Challan no.</label>
+            <input id="challan_no" placeholder="RCI/471" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label>Gate pass no.</label>
+            <input id="gate_pass_no" placeholder="0309292" />
+          </div>
+          <div>
+            <label>Place of supply</label>
+            <input id="place_supply" placeholder="Ajmer, Rajasthan" />
+          </div>
+        </div>
+
+        <div class="section-title">Items</div>
+        <table class="table" id="itemsTable">
+          <thead>
+            <tr>
+              <th style="width:42px;">#</th>
+              <th>Description</th>
+              <th style="width:90px;">Item code</th>
+              <th style="width:90px;">HSN/SAC</th>
+              <th style="width:80px;">Qty</th>
+              <th style="width:90px;">Unit</th>
+              <th style="width:110px;">Price/unit</th>
+              <th style="width:120px;">Amount</th>
+              <th style="width:80px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+
+        <div class="btn-row">
+          <button type="button" class="secondary" id="addItemBtn">Add item</button>
+          <button type="button" id="clearItemsBtn" class="danger">Clear items</button>
+        </div>
+
+        <div class="section-title">Amount in words & notes</div>
+        <label>Amount in words</label>
+        <input id="amount_words" placeholder="Thirty Thousand Eight Hundred Seventy Six Rupees only" />
+        <label>Description</label>
+        <textarea id="description" rows="2" placeholder="FOR VN. 4832 & 4853."></textarea>
+
+        <div class="section-title">Signatures</div>
+        <div class="grid-2">
+          <div>
+            <label>Received by (name)</label>
+            <input id="received_by_name" placeholder="श्री नीरज गर्ग" />
+          </div>
+          <div>
+            <label>Delivered by (name)</label>
+            <input id="delivered_by_name" placeholder="जितेन्द्र सिंह" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>Received by comment</label>
+            <input id="received_by_comment" placeholder="Gr Ind CA5m" />
+          </div>
+          <div>
+            <label>Delivered by comment</label>
+            <input id="delivered_by_comment" placeholder="" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>Authorized signatory title</label>
+            <input id="authorized_signatory" placeholder="3M gogps Authorized Signatory" />
+          </div>
+          <div>
+            <label>Acknowledgement date</label>
+            <input id="ack_date" type="date" />
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" id="generateBtn">Generate preview</button>
+          <button type="button" id="downloadBtn">Download PDF</button>
+        </div>
+      </form>
     </div>
 
-    <table>
-      <tr>
-        <th>Transportation Details</th>
-        <th>Challan Details</th>
-      </tr>
-      <tr>
-        <td>Vehicle Number: BY HAND</td>
-        <td>Challan No.: RCI/471</td>
-      </tr>
-      <tr>
-        <td>Gate Pass No.: 0309292</td>
-        <td>Date: 16-09-2025</td>
-      </tr>
-    </table>
-
-    <div class="section">
-      <table>
-        <tr>
-          <th>#</th>
-          <th>Item Name</th>
-          <th>Item Code</th>
-          <th>HSN/SAC</th>
-          <th>Quantity</th>
-          <th>Unit</th>
-          <th>Price/Unit</th>
-          <th>Amount</th>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>R/C INJECTOR ASSY BSIV TATA<br>Serial No.: 3034, 3035, 3036, 2725, 2722, 2721</td>
-          <td></td>
-          <td></td>
-          <td>6</td>
-          <td>Nos</td>
-          <td>₹ 2,573.00</td>
-          <td>₹ 15,438.00</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>R/C INJECTOR ASSY BSIV TATA<br>Serial No.: 3041, 3037, 3040, 3039, 3038, 428</td>
-          <td></td>
-          <td></td>
-          <td>6</td>
-          <td>Nos</td>
-          <td>₹ 2,573.00</td>
-          <td>₹ 15,438.00</td>
-        </tr>
-        <tr class="totals">
-          <td colspan="4">Total</td>
-          <td>12</td>
-          <td></td>
-          <td></td>
-          <td>₹ 30,876.00</td>
-        </tr>
-      </table>
+    <!-- Preview -->
+    <div class="preview card" id="preview">
+      <!-- Rendered challan goes here -->
+      <div class="muted">Fill the form and click “Generate preview”.</div>
     </div>
-
-    <div class="section">
-      <strong>Delivery Challan Amount in Words:</strong><br>
-      Thirty Thousand Eight Hundred Seventy Six Rupees only
-    </div>
-
-    <div class="section">
-      <strong>Description:</strong><br>
-      FOR VN. 4832 & 4853.
-    </div>
-
-    <table>
-      <tr>
-        <td>Sub Total</td>
-        <td>₹ 30,876.00</td>
-      </tr>
-      <tr>
-        <td>Total</td>
-        <td>₹ 30,876.00</td>
-      </tr>
-    </table>
-
-    <div class="section">
-      <strong>Terms and Conditions:</strong><br>
-      ASSYS. ISSUED BY AS PER ORDER GIVEN BY C.P.M. SIR / P.M. SIR OF CWS AJMER.
-    </div>
-
-    <table class="footer-table">
-      <tr>
-        <th>Received By</th>
-        <th colspan="2">Delivered By</th>
-        <th></th>
-      </tr>
-      <tr>
-        <td>Name:</td>
-        <td>Name:</td>
-        <td></td>
-        <td>For: OLD R&D CWS RSRTC AJMER</td>
-      </tr>
-      <tr>
-        <td>Comment: Gr Ind CA5m</td>
-        <td>Comment:</td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Date:</td>
-        <td colspan="2">Date:</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Signature:</td>
-        <td colspan="2">Signature:</td>
-        <td>3M gogps Authorized Signatory</td>
-      </tr>
-    </table>
   </div>
+
+  <script>
+    // State
+    let items = [];
+
+    // Helpers
+    function currency(n) {
+      const num = Number(n || 0);
+      return "₹ " + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function sumAmounts() {
+      return items.reduce((acc, it) => acc + (Number(it.qty) * Number(it.price || 0)), 0);
+    }
+
+    // Items UI
+    function addItem(prefill = {}) {
+      items.push({
+        desc: prefill.desc || "",
+        code: prefill.code || "",
+        hsn: prefill.hsn || "",
+        qty: prefill.qty || 0,
+        unit: prefill.unit || "Nos",
+        price: prefill.price || 0
+      });
+      renderItemsTable();
+    }
+    function removeItem(index) {
+      items.splice(index, 1);
+      renderItemsTable();
+    }
+    function renderItemsTable() {
+      const tbody = document.getElementById("itemsBody");
+      tbody.innerHTML = "";
+      items.forEach((it, i) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>
+            <textarea rows="2" style="width:100%">${it.desc}</textarea>
+          </td>
+          <td><input type="text" value="${it.code}"></td>
+          <td><input type="text" value="${it.hsn}"></td>
+          <td><input type="number" min="0" step="1" value="${it.qty}"></td>
+          <td><input type="text" value="${it.unit}"></td>
+          <td><input type="number" min="0" step="0.01" value="${it.price}"></td>
+          <td>${currency(Number(it.qty) * Number(it.price || 0))}</td>
+          <td><button type="button" class="danger" data-remove="${i}">Delete</button></td>
+        `;
+
+        // Bind change events
+        const inputs = tr.querySelectorAll("input, textarea");
+        inputs[0].addEventListener("input", e => { items[i].desc = e.target.value; renderItemsTable(); });
+        inputs[1].addEventListener("input", e => { items[i].code = e.target.value; });
+        inputs[2].addEventListener("input", e => { items[i].hsn = e.target.value; });
+        inputs[3].addEventListener("input", e => { items[i].qty = Number(e.target.value); renderItemsTable(); });
+        inputs[4].addEventListener("input", e => { items[i].unit = e.target.value; });
+        inputs[5].addEventListener("input", e => { items[i].price = Number(e.target.value); renderItemsTable(); });
+
+        // Delete button
+        tr.querySelector("[data-remove]").addEventListener("click", () => removeItem(i));
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Seed with two example rows (you can remove these)
+    addItem({
+      desc: "R/C INJECTOR ASSY BSIV TATA\nSerial No.: 3034, 3035, 3036, 2725, 2722, 2721",
+      qty: 6, unit: "Nos", price: 2573
+    });
+    addItem({
+      desc: "R/C INJECTOR ASSY BSIV TATA\nSerial No.: 3041, 3037, 3040, 3039, 3038, 428",
+      qty: 6, unit: "Nos", price: 2573
+    });
+
+    // Generate preview
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      const company = document.getElementById("company_name").value || "OLD R&D CWS RSRTC AJMER";
+      const phone = document.getElementById("company_phone").value || "9549456734 / 9549656296";
+      const address = document.getElementById("company_address").value || "MAKHUPURA AJMER";
+      const challanFor = document.getElementById("challan_for").value || "CTG";
+      const date = document.getElementById("challan_date").value;
+      const vehicle = document.getElementById("vehicle_number").value || "BY HAND";
+      const challanNo = document.getElementById("challan_no").value || "RCI/471";
+      const gatePass = document.getElementById("gate_pass_no").value || "0309292";
+      const placeSupply = document.getElementById("place_supply").value || "";
+      const words = document.getElementById("amount_words").value || "";
+      const desc = document.getElementById("description").value || "";
+      const recvName = document.getElementById("received_by_name").value || "श्री नीरज गर्ग";
+      const delvName = document.getElementById("delivered_by_name").value || "जितेन्द्र सिंह";
+      const recvComment = document.getElementById("received_by_comment").value || "Gr Ind CA5m";
+      const delvComment = document.getElementById("delivered_by_comment").value || "";
+      const authSign = document.getElementById("authorized_signatory").value || "3M gogps Authorized Signatory";
+      const ackDate = document.getElementById("ack_date").value || "";
+
+      const total = sumAmounts();
+
+      const itemsRows = items.map((it, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${it.desc.replace(/\n/g, "<br>")}</td>
+          <td>${it.code || ""}</td>
+          <td>${it.hsn || ""}</td>
+          <td>${it.qty}</td>
+          <td>${it.unit}</td>
+          <td>${currency(it.price)}</td>
+          <td>${currency(Number(it.qty) * Number(it.price || 0))}</td>
+        </tr>
+      `).join("");
+
+      const html = `
+        <div class="header">
+          <h2>${company}</h2>
+          <div class="muted">${address} • Phone: ${phone}</div>
+        </div>
+
+        <div class="section-title">Delivery challan</div>
+        <div class="flex">
+          <div class="flex-col">
+            <div><strong>Delivery challan for:</strong> ${challanFor}</div>
+            ${placeSupply ? `<div><strong>Place of supply:</strong> ${placeSupply}</div>` : ""}
+          </div>
+          <div class="flex-col">
+            <table class="table">
+              <tr><th>Transportation details</th><th>Challan details</th></tr>
+              <tr><td>Vehicle number: ${vehicle}</td><td>Challan no.: ${challanNo}</td></tr>
+              <tr><td>Gate pass no.: ${gatePass}</td><td>Date: ${date || ""}</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="section-title">Item details</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Item name</th>
+              <th>Item code</th>
+              <th>HSN/SAC</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+              <th>Price/Unit</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsRows}
+            <tr>
+              <td></td><td><strong>Total</strong></td><td></td><td></td>
+              <td>${items.reduce((a, b) => a + Number(b.qty || 0), 0)}</td>
+              <td></td><td></td><td>${currency(total)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="totals-box">
+          <div class="totals-card">
+            <div class="totals-line"><span class="muted">Sub total</span><span>${currency(total)}</span></div>
+            <div class="totals-line"><strong>Total</strong><strong>${currency(total)}</strong></div>
+            ${words ? `<div class="totals-line"><span class="muted">Amount in words</span><span>${words}</span></div>` : ""}
+          </div>
+        </div>
+
+        ${desc ? `<div class="section-title">Description</div><div>${desc}</div>` : ""}
+
+        <div class="section-title">Terms and conditions</div>
+        <div>ASSYS. ISSUED BY AS PER ORDER GIVEN BY C.P.M. SIR / P.M. SIR OF CWS AJMER.</div>
+
+        <div class="section-title">Signatures</div>
+        <div class="signatures">
+          <div class="sign-card">
+            <div><strong>Received by:</strong> ${recvName}</div>
+            <div class="muted">Comment: ${recvComment}</div>
+            <div class="muted">Date: ${ackDate || ""}</div>
+            <div class="signature-line"></div>
+          </div>
+          <div class="sign-card">
+            <div><strong>Delivered by:</strong> ${delvName}</div>
+            <div class="muted">Comment: ${delvComment}</div>
+            <div><strong>For:</strong> ${company}</div>
+            <div class="muted">${authSign}</div>
+            <div class="signature-line"></div>
+          </div>
+        </div>
+      `;
+      document.getElementById("preview").innerHTML = html;
+    });
+
+    // Add/Clear items
+    document.getElementById("addItemBtn").addEventListener("click", () => addItem());
+    document.getElementById("clearItemsBtn").addEventListener("click", () => { items = []; renderItemsTable(); });
+
+    // Download PDF (uses browser print with print styles)
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      // Ensure preview is generated
+      if (!document.getElementById("preview").innerText.trim()) {
+        document.getElementById("generateBtn").click();
+      }
+      window.print();
+    });
+  </script>
 </body>
 </html>
